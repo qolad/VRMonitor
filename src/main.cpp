@@ -5,8 +5,20 @@
 int main (void){
     std::cout << "VR Monitor starting...\n";
 
+    vr::EVRInitError error = vr::VRInitError_None;
 
-    std::cout << "openvr version: " << vr::k_nSteamVRVersionMinor << '\n';
+    vr::IVRSystem* vrSystem = vr::VR_Init(
+        &error,
+        vr::VRApplication_Overlay
+    );
 
-    
+    if (error != vr::VRInitError_None){
+        std::cout << "OpenVR initialization failed: " << vr::VR_GetVRInitErrorAsEnglishDescription(error) << "\n";
+        return 1;
+    }
+
+    std::cout << "OpenVR initialztion successfully!\n";
+
+    vr::VR_Shutdown;
+
 }

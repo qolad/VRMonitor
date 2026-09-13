@@ -11,3 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(VRMonitor
     src/main.cpp
 )
+
+target_include_directories(VRMonitor PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/third-party/openvr/headers
+)

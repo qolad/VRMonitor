@@ -1,16 +1,19 @@
 #include <iostream>
-#include <cstdio> 
+#include <thread>
+#include <cstdio>
+#include <chrono> 
 #include <filesystem>
-#include <openvr.h>
 
-namespace fs = std::filesystem;
+#include <openvr.h>
+#include <capture.h>
+#include <fakeCapture.h>
+
 
 int main(int argc, char* argv[]){
     std::string myString = "SteamOverylay";
+
     std::cout << "VR Monitor starting..." << std::endl;
 
-    const fs::path imagePath = fs::absolute("image.png");
-    
     vr::EVRInitError error = vr::VRInitError_None;
 
     vr::IVRSystem* vrSystem = vr::VR_Init(&error, vr::VRApplication_Overlay);
@@ -20,6 +23,20 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
+    FakeCapture capture;
+
+    if (!capture.start()){
+        std::cout << "Failed to start capture!" << std::endl;
+
+        vr::VR_Shutdown();
+        return 1;
+    }
+
+    Frame frame;
+
+    if (capture.getFrame(frame)){
+        std::cout << "Captured frame: " << frame.width << "x" << frame.height << std::endl;
+    }
 
     std::string sKey = std::string("sample." ) + myString;
 
@@ -31,25 +48,19 @@ int main(int argc, char* argv[]){
     if (overlayError != vr::VROverlayError_None){
         std::cout << "Dashboard overlay creation failed: " << vr::VROverlay()->GetOverlayErrorNameFromEnum(overlayError) << std::endl;
 
-        
+        capture.stop();
         vr::VR_Shutdown();
         return 1;
     }
 
-
     std::cout << "Dashboard created successfully!" << std::endl;
+    //std::cin.get();
 
-
-    vr::VROverlay()->SetOverlayFromFile(mainHandle, imagePath.string().c_str());
-
-   if (overlayError != vr::VROverlayError_None){
-        std::cout << "Failed to load image: " << vr::VROverlay()->GetOverlayErrorNameFromEnum(overlayError) << std::endl;
-    }else{
-        std::cout << "Image loaded successfully!" << std::endl;
+    while (true){
+        std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
-    
-    std::cin.get();
 
+    capture.stop();
     vr::VR_Shutdown();
 
     return 0;

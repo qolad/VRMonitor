@@ -10,14 +10,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(VRMonitor
     src/main.cpp
+    src/fakeCapture.cpp
 )
 
-# OpenVR headers
 target_include_directories(VRMonitor PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/third-party/openvr/headers
+    ${CMAKE_CURRENT_SOURCE_DIR}/headers
 )
 
-# OpenVR library
 if(WIN32)
 
     target_link_libraries(VRMonitor PRIVATE

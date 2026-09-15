@@ -24,6 +24,12 @@ if(WIN32)
         ${CMAKE_CURRENT_SOURCE_DIR}/third-party/openvr/lib/win64/openvr_api.lib
     )
 
+    add_custom_command(TARGET VRMonitor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/third-party/openvr/bin/win64/openvr_api.dll"
+            "$<TARGET_FILE_DIR:VRMonitor>"
+    )
+
 elseif(UNIX AND NOT APPLE)
 
     target_link_libraries(VRMonitor PRIVATE

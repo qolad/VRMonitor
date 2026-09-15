@@ -1,11 +1,16 @@
 #include <iostream>
 #include <cstdio> 
+#include <filesystem>
 #include <openvr.h>
+
+namespace fs = std::filesystem;
 
 int main(int argc, char* argv[]){
     std::string myString = "SteamOverylay";
     std::cout << "VR Monitor starting..." << std::endl;
 
+    const fs::path imagePath = fs::absolute("image.png");
+    
     vr::EVRInitError error = vr::VRInitError_None;
 
     vr::IVRSystem* vrSystem = vr::VR_Init(&error, vr::VRApplication_Overlay);
@@ -15,7 +20,6 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
-    std::cout << "OpenVR initialized successfully!" << std::endl;
 
     std::string sKey = std::string("sample." ) + myString;
 
@@ -25,7 +29,7 @@ int main(int argc, char* argv[]){
     vr::VROverlayError  overlayError = vr::VROverlay()->CreateDashboardOverlay(sKey.c_str(), myString.c_str(), &mainHandle, &tumbnailHandle);
 
     if (overlayError != vr::VROverlayError_None){
-        std::cout << "Overlay creation failed: " << vr::VROverlay()->GetOverlayErrorNameFromEnum(overlayError) << std::endl;
+        std::cout << "Dashboard overlay creation failed: " << vr::VROverlay()->GetOverlayErrorNameFromEnum(overlayError) << std::endl;
 
         
         vr::VR_Shutdown();
@@ -33,8 +37,17 @@ int main(int argc, char* argv[]){
     }
 
 
-    std::cout << "Overy created successfully!" << std::endl;
+    std::cout << "Dashboard created successfully!" << std::endl;
 
+
+    vr::VROverlay()->SetOverlayFromFile(mainHandle, imagePath.string().c_str());
+
+   if (overlayError != vr::VROverlayError_None){
+        std::cout << "Failed to load image: " << vr::VROverlay()->GetOverlayErrorNameFromEnum(overlayError) << std::endl;
+    }else{
+        std::cout << "Image loaded successfully!" << std::endl;
+    }
+    
     std::cin.get();
 
     vr::VR_Shutdown();
